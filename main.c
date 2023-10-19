@@ -1,9 +1,9 @@
 /*
-PORTC5 - PIN A5 - ADC 5
+PORTC5 - PIN A5
 PORTC4 - PIN A4
 PORTC3 - PIN A3
 PORTC2 - PIN A2
-PORTC1 - PIN A1
+PORTC1 - PIN A1 - ADC 1
 PORTC0 - PIN A0
 
 PORTD7 - PIN 7
@@ -43,7 +43,7 @@ PIN 4 - LED VERDE
 #define velMid 333		// Velocidad Media
 #define velSeg 100		// Velocidad de Seguridad
 
-#define BOTON PORTBx
+#define BOTON PINXx
 
 #define MA1 PORTBx
 #define MA2 PORTBx
@@ -58,27 +58,11 @@ unsigned int tiempo = 0;
 
 typedef enum{
 OFF,
-ADELANTE,
-DERECHA,
-IZQUIERDA,
-ATRAS,
-SAFETY_CAR
+ON
 } STATE;
-
-typedef struct{
-void (*func)();
-} FSM;
 
 STATE estado = OFF;
 
-FSM Autito[] = {
-{F_OFF},
-{F_ADELANTE},
-{F_DERECHA},
-{F_IZQUIERDA},
-{F_ATRAS},
-{F_SAFETY_CAR}
-};
 
 void configPORT(){
 	DDRC = 0x0F;	// STANDBY
@@ -110,7 +94,7 @@ unsigned short readADC(unsigned char canal){
 }
 
 void fotoresistor(){
-	fotores = readADC(x); // cambiar
+	fotores = readADC(1);
 	
 	if(fotores > x){ // cambiar
 		PORTB |= (1 << x); // cambiar
@@ -120,22 +104,7 @@ void fotoresistor(){
 	_delay_ms(100);
 }
 
-void F_OFF(){
-	PORTx &= ~(1 << MA1);
-	PORTx &= ~(1 << MA2);
-	
-	PORTx &= ~(1 << MB1);
-	PORTx &= ~(1 << MB2);
-	
-	PORTx &= ~(1 << LED_R);
-	PORTx &= ~(1 << LED_V);
-	
-	if((PINx & (1 << BOTON)){
-		estado = ADELANTE;
-	}
-}
-
-void F_ADELANTE(){
+void ADELANTE(){
 	OCR1A = velMax;
 	
 	PORTx |= (1 << MA1);
@@ -149,17 +118,12 @@ void F_ADELANTE(){
 	
 	fotoresistor();
 	
-	//tiempo :)
-	
-	if((PINx & (1 << BOTON)){
+	if((PINx & (1 << BOTON)) != 0){
 		estado = OFF;
-	} else if(/* tiempo */){
-		estado = x;
-		tiempo = 0;
 	}
 }
 
-void F_DERECHA(){
+void DERECHA(){
 	OCR1A = velMax;
 	
 	PORTx |= (1 << MA1);
@@ -175,17 +139,12 @@ void F_DERECHA(){
 	
 	fotoresistor();
 	
-	//tiempo :)
-	
-	if((PINx & (1 << BOTON)){
+	if((PINx & (1 << BOTON)) != 0){
 		estado = OFF;
-	} else if(/* tiempo */){
-		estado = x;
-		tiempo = 0;
 	}
 }
 
-void F_IZQUIERDA(){
+void IZQUIERDA(){
 	OCR1A = velDiff;
 	
 	PORTx |= (1 << MA1);
@@ -201,17 +160,12 @@ void F_IZQUIERDA(){
 	
 	fotoresistor();
 	
-	//tiempo :)
-	
-	if((PINx & (1 << BOTON)){
+	if((PINx & (1 << BOTON)) != 0){
 		estado = OFF;
-	} else if(/* tiempo */){
-		estado = x;
-		tiempo = 0;
 	}
 }
 
-void F_ATRAS(){
+void ATRAS(){
 	OCR1A = velMid;
 	
 	PORTx &= ~(1 << MA1);
@@ -225,17 +179,12 @@ void F_ATRAS(){
 	
 	fotoresistor();
 	
-	//tiempo :)
-	
-	if((PINx & (1 << BOTON)){
+	if((PINx & (1 << BOTON)) != 0){
 		estado = OFF;
-	} else if(/* tiempo */){
-		estado = x;
-		tiempo = 0;
 	}
 }
 
-void F_SAFETY_CAR(){
+void SAFETY_CAR(){
 	OCR1A = velSeg;
 	
 	PORTx |= (1 << MA1);
@@ -249,17 +198,46 @@ void F_SAFETY_CAR(){
 	
 	fotoresistor();
 	
-	//tiempo :)
-	
-	if((PINx & (1 << BOTON)){
+	if((PINx & (1 << BOTON)) != 0){
 		estado = OFF;
-	} else if(/* tiempo */){
-		estado = x;
-		tiempo = 0;
 	}
 }
 
+void F_OFF(){
+	PORTx &= ~(1 << MA1);
+	PORTx &= ~(1 << MA2);
+	
+	PORTx &= ~(1 << MB1);
+	PORTx &= ~(1 << MB2);
+	
+	PORTx &= ~(1 << LED_R);
+	PORTx &= ~(1 << LED_V);
+	
+	if((PINx & (1 << BOTON)) != 0){
+		estado = ON;
+	}
+}
+
+void F_ON(){
+	ADELANTE();
+	_delay_ms(2000);
+	DERECHA();
+	_delay_ms(1000);
+	ADELANTE();
+	_delay_ms(2000);
+	IZQUIERDA();
+	_delay_ms(1000);
+	ATRAS();
+	_delay_ms(2000);
+	SAFETY_CAR();
+	_delay_ms(4000);
+}
+
 int main(void){
+	
+	void (*Autito[2])();
+	Autito[OFF] = F_OFF;
+	Autito[ON] = F_ON;
 	
     configPWM();
 	
@@ -268,6 +246,6 @@ int main(void){
 	configADC();
 	
     while(1){
-		(*Autito[estado].func)();
+		Autito[estado]();
     }
 }
