@@ -18,10 +18,14 @@ void ADELANTE(){
 	
 	fotoresistor();
 	
-	if((PIND & (1 << BOTON)) == 1){
+	tiempo++;
+	
+	if((PIND & (1 << BOTON)) != 0){
 		tiempo = 0;
+		_delay_ms(500);
 		estado = OFF;
 	} else if(tiempo >= 50){
+		tiempo = 0;
 		return;
 	}
 }
@@ -38,7 +42,20 @@ void DERECHA(){
 	
 	PORTD |= (1 << LED_V);
 	PORTD &= ~(1 << LED_R);
-	_delay_ms(100);
+	_delay_ms(50);
+	
+	fotoresistor();
+	
+	tiempo++;
+	
+	if((PIND & (1 << BOTON)) != 0){
+		tiempo = 0;
+		_delay_ms(500);
+		estado = OFF;
+		} else if(tiempo >= 50){
+		tiempo = 0;
+		return;
+	}
 }
 
 void IZQUIERDA(){
@@ -53,7 +70,20 @@ void IZQUIERDA(){
 	
 	PORTD |= (1 << LED_V);
 	PORTD &= ~(1 << LED_R);
-	_delay_ms(100);
+	_delay_ms(50);
+	
+	fotoresistor();
+	
+	tiempo++;
+	
+	if((PIND & (1 << BOTON)) != 0){
+		tiempo = 0;
+		_delay_ms(500);
+		estado = OFF;
+		} else if(tiempo >= 50){
+		tiempo = 0;
+		return;
+	}
 }
 
 void ATRAS(){
@@ -68,7 +98,20 @@ void ATRAS(){
 	
 	PORTD &= ~(1 << LED_V);
 	PORTD |= (1 << LED_R);
-	_delay_ms(100);
+	_delay_ms(50);
+	
+	fotoresistor();
+	
+	tiempo++;
+	
+	if((PIND & (1 << BOTON)) != 0){
+		tiempo = 0;
+		_delay_ms(500);
+		estado = OFF;
+	} else if(tiempo >= 50){
+		tiempo = 0;
+		return;
+	}
 }
 
 void SAFETY_CAR(){
@@ -83,5 +126,18 @@ void SAFETY_CAR(){
 	
 	PORTD |= (1 << LED_V);
 	PORTD &= ~(1 << LED_R);
-	_delay_ms(100);
+	_delay_ms(50);
+	
+	fotoresistor();
+	
+	tiempo++;
+	
+	if((PIND & (1 << BOTON)) != 0){
+		tiempo = 0;
+		_delay_ms(500);
+		estado = OFF;
+		} else if(tiempo >= 50){
+		tiempo = 0;
+		return;
+	}
 }

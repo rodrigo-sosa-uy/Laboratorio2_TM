@@ -19,7 +19,7 @@ uint16_t readADC(uint8_t canal){
 void fotoresistor(){
 	fotores = readADC(1);
 	
-	if(fotores < LUZ_NATURAL){
+	if(fotores > LUZ_NATURAL){ // >
 		PORTD |= (1 << LUZ);
 		} else{
 		PORTD &= ~(1 << LUZ);

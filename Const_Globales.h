@@ -6,7 +6,7 @@
 #define velMid 140		// Velocidad Media (3,75v)
 #define velSeg 125 		// Velocidad de Seguridad (2,85v)
 
-#define BOTON PORTD0
+#define BOTON PORTD7
 
 #define MA1 PORTB2
 #define MA2 PORTB1
@@ -17,6 +17,6 @@
 #define LED_R PORTD4
 #define LUZ PORTD1
 
-#define LUZ_NATURAL 300
+#define LUZ_NATURAL 450
 
 #endif

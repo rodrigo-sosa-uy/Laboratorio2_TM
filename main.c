@@ -14,7 +14,7 @@ typedef enum{
 } STATE;
 
 typedef struct{
-void (*func)();
+	void (*func)();
 }FSM;
 
 STATE estado = OFF;
@@ -23,8 +23,8 @@ void F_OFF();
 void F_ON();
 
 FSM Autito[] = {
-{F_OFF},
-{F_ON}	
+	{F_OFF},
+	{F_ON}
 };
 
 #include "libraries/Const_Globales.h"
@@ -41,14 +41,16 @@ void F_OFF(){
 	PORTD &= ~(1 << LED_R);
 	PORTD &= ~(1 << LED_V);
 	
-	if((PIND & (1 << BOTON)) == 1){
+	fotoresistor();
+	
+	if((PIND & (1 << BOTON)) != 0){
+		_delay_ms(500);
 		estado = ON;
 	}
 }
 
 void F_ON(){
 	ADELANTE();
-	DERECHA();
 }
 
 int main(void){
@@ -66,7 +68,7 @@ int main(void){
 
 void configPORT(){
 	DDRB = 0xFF;
-	DDRD = 0xFE;
+	DDRD = 0b01111110;
 	DDRC = 0x00;
 }
 
