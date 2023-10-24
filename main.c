@@ -1,21 +1,35 @@
 #define F_CPU 16000000UL
 #include <avr/io.h>
 #include <util/delay.h>
-#include "Const_Globales.h"
-#include "fotorresistor.h"
-#include "movimiento.h"
+
+void configPORT();
+void configPWM();
 
 uint16_t fotores;
+uint8_t tiempo = 0;
 
 typedef enum{
-OFF,
-ON
+	OFF,
+	ON
 } STATE;
+
+typedef struct{
+void (*func)();
+}FSM;
+
+STATE estado = OFF;
 
 void F_OFF();
 void F_ON();
 
-STATE estado = OFF;
+FSM Autito[] = {
+{F_OFF},
+{F_ON}	
+};
+
+#include "libraries/Const_Globales.h"
+#include "libraries/fotorresistor.h"
+#include "libraries/movimiento.h"
 
 void F_OFF(){
 	PORTB &= ~(1 << MA1);
@@ -27,27 +41,24 @@ void F_OFF(){
 	PORTD &= ~(1 << LED_R);
 	PORTD &= ~(1 << LED_V);
 	
-	if((PIND & (1 << BOTON)) != 0){
+	if((PIND & (1 << BOTON)) == 1){
 		estado = ON;
 	}
 }
 
 void F_ON(){
-	// comportamiento
+	ADELANTE();
+	DERECHA();
 }
 
 int main(void){
-	
-	void (*Autito[2])();
-	Autito[OFF] = F_OFF;
-	Autito[ON] = F_ON;
-	
+
 	configPWM();
 	configPORT();
 	configADC();
 	
 	while(1){
-		(*Autito[estado])();
+		(*Autito[estado].func)();
 	}
 	
 	return 0;

@@ -1,5 +1,7 @@
 #include "movimiento.h"
 
+#include "fotorresistor.h"
+
 void ADELANTE(){
 	OCR0B = velMax;
 	OCR0A = velMax;
@@ -12,7 +14,16 @@ void ADELANTE(){
 	
 	PORTD |= (1 << LED_V);
 	PORTD &= ~(1 << LED_R);
-	_delay_ms(100);
+	_delay_ms(50);
+	
+	fotoresistor();
+	
+	if((PIND & (1 << BOTON)) == 1){
+		tiempo = 0;
+		estado = OFF;
+	} else if(tiempo >= 50){
+		return;
+	}
 }
 
 void DERECHA(){
