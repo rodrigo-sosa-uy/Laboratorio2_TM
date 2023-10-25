@@ -1,6 +1,7 @@
 #define F_CPU 16000000UL
 #include <avr/io.h>
 #include <util/delay.h>
+#include "libraries/Const_Globales.h"
 
 void configPORT();
 void configPWM();
@@ -10,26 +11,31 @@ uint8_t tiempo = 0;
 
 typedef enum{
 	OFF,
-	ON
+	ADELANTE,
+	ATRAS,
+	DERECHA,
+	IZQUIERDA,
+	SAFETY_CAR
 } STATE;
 
 typedef struct{
-	void (*func)();
+void (*func)();
 }FSM;
 
 STATE estado = OFF;
 
 void F_OFF();
-void F_ON();
-
-FSM Autito[] = {
-	{F_OFF},
-	{F_ON}
-};
-
-#include "libraries/Const_Globales.h"
 #include "libraries/fotorresistor.h"
 #include "libraries/movimiento.h"
+
+FSM Autito[] = {
+{F_OFF},
+{F_ADELANTE},
+{F_ATRAS},
+{F_DERECHA},
+{F_IZQUIERDA},
+{F_SAFETY_CAR}
+};
 
 void F_OFF(){
 	PORTB &= ~(1 << MA1);
@@ -43,14 +49,10 @@ void F_OFF(){
 	
 	fotoresistor();
 	
-	if((PIND & (1 << BOTON)) != 0){
+	if((PINB & (1 << BOTON)) != 0){
 		_delay_ms(500);
-		estado = ON;
+		estado = ADELANTE;
 	}
-}
-
-void F_ON(){
-	ADELANTE();
 }
 
 int main(void){
@@ -67,7 +69,7 @@ int main(void){
 }
 
 void configPORT(){
-	DDRB = 0xFF;
+	DDRB = 0b11011111;
 	DDRD = 0b01111110;
 	DDRC = 0x00;
 }
