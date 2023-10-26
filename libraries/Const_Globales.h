@@ -7,6 +7,7 @@
 #define velSeg 60 		// Velocidad de Seguridad
 
 #define BOTON PORTB5
+#define CHOKE PORTD7
 
 #define MA1 PORTB2
 #define MA2 PORTB1
